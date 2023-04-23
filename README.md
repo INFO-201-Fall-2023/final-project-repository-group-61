@@ -1,3 +1,3 @@
 # Project Name: 
-## Authors: 
+## Authors: Renee Singh, 
 Project Proposal:
