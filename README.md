@@ -1,3 +1,3 @@
 # Project Name: 
-## Authors: Renee Singh, Kendrick Echevarria
+## Authors: Renee Singh, Srijami Das
 Project Proposal:
