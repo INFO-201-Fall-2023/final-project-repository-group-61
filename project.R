@@ -32,7 +32,10 @@ demo_df <- mutate(demo_df, TOT_H = H_MALE + H_FEMALE)
 demo_df <- relocate(demo_df, TOT_H, .after=H_FEMALE)
 
 # adding up age groups
-
+col_names <- names(demo_df)
+col_names <- col_names[10:88]
+grouped_demo_df <- group_by(demo_df, STNAME, CTYNAME, age_category)
+grouped_demo_df <- summarise(grouped_demo_df, across(all_of(col_names), sum))
 
 
 
