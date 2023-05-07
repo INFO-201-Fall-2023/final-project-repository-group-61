@@ -37,5 +37,34 @@ col_names <- col_names[10:88]
 grouped_demo_df <- group_by(demo_df, STNAME, CTYNAME, age_category)
 grouped_demo_df <- summarise(grouped_demo_df, across(all_of(col_names), sum))
 
+# removing extra rows & any NA
+
+vacc_df <- vacc_df[,0:29]
+vacc_df_col_names <- names(vacc_df)
+vacc_df[is.na(vacc_df)] <- 0
+
+# merging dataframes
+
+counties_vec <- grouped_demo_df$CTYNAME
+
+vector_app <- function(df, new_vec_name, target_col_name, age_cat) {
+  df <- grouped_demo_df
+  new_vec_name <- c()
+  for (county in counties_vec) {
+    single_county_df <- filter(df, CTYNAME == county, age_category == age_cat)
+    new_vec_name <- append(new_vec_name, single_county_df$target_col_name)
+    return (new_vec_name)
+  }
+}
+
+vector_app(total_adult_pop, TOT_POP, 'ADULT')
+
+#thingy <- filter(grouped_demo_df, CTYNAME == 'Autauga County', age_category == 'ADULT')
+#vec <- c()
+#vec <- append(vec, thingy$TOT_POP)
+#thingy <- filter(grouped_demo_df, CTYNAME == 'Autauga County', age_category == 'ADULT')
+#vec <- append(vec, thingy$TOT_WA)
+
+
 
 
