@@ -49,10 +49,12 @@ grouped_demo_df$state_code <- state.abb[match(grouped_demo_df$STNAME, state.name
 grouped_demo_df <- ungroup(grouped_demo_df, STNAME)
 
 vector_app <- function(target_col_name, age_cat) {
+  cn_index <-grep('CTYNAME', colnames(grouped_demo_df))
+  sc_index <- grep('state_code', colnames(grouped_demo_df))
   column_index <- grep(target_col_name, colnames(grouped_demo_df))
   target_df <- grouped_demo_df[grouped_demo_df$age_category == age_cat, ]
-  new_vec <- target_df[c(1:nrow(target_df)), column_index]
-  return(new_vec)
+  vec_append <- target_df[c(1:nrow(target_df)), c(column_index, sc_index, cn_index)]
+  return(vec_append)
 }
 
 
