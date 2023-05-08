@@ -65,6 +65,12 @@ vector_app(total_adult_pop, TOT_POP, 'ADULT')
 #thingy <- filter(grouped_demo_df, CTYNAME == 'Autauga County', age_category == 'ADULT')
 #vec <- append(vec, thingy$TOT_WA)
 
+vector_app <- function(target_col_name, age_cat) {
+  column_index <- grep(target_col_name, colnames(grouped_demo_df))
+  target_df <- grouped_demo_df[grouped_demo_df$age_category == age_cat, ]
+  vec_append <- target_df[c(1:nrow(target_df)), column_index]
+  return(vec_append)
+}
 
-
-
+tot_pop_vec <- vector_app('TOT_POP', 'ADULT')
+temp <- filter(vacc_df, Date == '07/29/2021')
