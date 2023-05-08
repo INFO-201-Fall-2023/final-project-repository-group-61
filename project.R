@@ -45,26 +45,6 @@ vacc_df[is.na(vacc_df)] <- 0
 
 # merging dataframes
 
-counties_vec <- grouped_demo_df$CTYNAME
-
-vector_app <- function(df, new_vec_name, target_col_name, age_cat) {
-  df <- grouped_demo_df
-  new_vec_name <- c()
-  for (county in counties_vec) {
-    single_county_df <- filter(df, CTYNAME == county, age_category == age_cat)
-    new_vec_name <- append(new_vec_name, single_county_df$target_col_name)
-    return (new_vec_name)
-  }
-}
-
-vector_app(total_adult_pop, TOT_POP, 'ADULT')
-
-#thingy <- filter(grouped_demo_df, CTYNAME == 'Autauga County', age_category == 'ADULT')
-#vec <- c()
-#vec <- append(vec, thingy$TOT_POP)
-#thingy <- filter(grouped_demo_df, CTYNAME == 'Autauga County', age_category == 'ADULT')
-#vec <- append(vec, thingy$TOT_WA)
-
 vector_app <- function(target_col_name, age_cat) {
   column_index <- grep(target_col_name, colnames(grouped_demo_df))
   target_df <- grouped_demo_df[grouped_demo_df$age_category == age_cat, ]
