@@ -45,12 +45,29 @@ vacc_df[is.na(vacc_df)] <- 0
 
 # merging dataframes
 
+grouped_demo_df$state_code <- state.abb[match(grouped_demo_df$STNAME, state.name)]
+grouped_demo_df <- ungroup(grouped_demo_df, STNAME)
+
 vector_app <- function(target_col_name, age_cat) {
   column_index <- grep(target_col_name, colnames(grouped_demo_df))
   target_df <- grouped_demo_df[grouped_demo_df$age_category == age_cat, ]
-  vec_append <- target_df[c(1:nrow(target_df)), column_index]
-  return(vec_append)
+  new_vec <- target_df[c(1:nrow(target_df)), column_index]
+  return(new_vec)
 }
 
-tot_pop_vec <- vector_app('TOT_POP', 'ADULT')
-temp <- filter(vacc_df, Date == '07/29/2021')
+
+demo_tester <- filter(grouped_demo_df, age_category == 'ADULT')
+demo_tester <- select(demo_tester, state_code, CTYNAME, total_adult_pop = TOT_POP)
+
+
+merger_df <- left_join(x = vacc_df,
+                       y = demo_tester,
+                       by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
+
+demo_tester <- filter(grouped_demo_df, age_category == 'CHILD')
+demo_tester <- select(demo_tester, state_code, CTYNAME, total_child_pop = TOT_POP)
+
+
+merger_df <- left_join(x = merger_df,
+                       y = demo_tester,
+                       by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
