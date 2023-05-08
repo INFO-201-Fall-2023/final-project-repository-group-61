@@ -42,7 +42,6 @@ grouped_demo_df <- summarise(grouped_demo_df, across(all_of(col_names), sum))
 vacc_df <- vacc_df[,0:29]
 vacc_df_col_names <- names(vacc_df)
 vacc_df[is.na(vacc_df)] <- 0
-
 # merging dataframes
 
 grouped_demo_df$state_code <- state.abb[match(grouped_demo_df$STNAME, state.name)]
@@ -54,19 +53,39 @@ vector_app <- function(target_col_name, age_cat) {
   return(vec_append)
 }
 
-
 demo_tester <- filter(grouped_demo_df, age_category == 'ADULT')
-demo_tester <- select(demo_tester, state_code, CTYNAME, total_adult_pop = TOT_POP)
+demo_tester <- select(demo_tester, state_code, CTYNAME, TOT_POP_ADULT = TOT_POP)
 
-
-merger_df <- left_join(x = vacc_df,
-                       y = demo_tester,
-                       by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
+df <- left_join(x = vacc_df,
+                y = demo_tester,
+                by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
 
 demo_tester <- filter(grouped_demo_df, age_category == 'CHILD')
-demo_tester <- select(demo_tester, state_code, CTYNAME, total_child_pop = TOT_POP)
+demo_tester <- select(demo_tester, state_code, CTYNAME, TOT_POP_CHILD = TOT_POP)
 
+df <- left_join(x = df,
+                y = demo_tester,
+                by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
 
-merger_df <- left_join(x = merger_df,
-                       y = demo_tester,
-                       by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
+demo_tester <- filter(grouped_demo_df, age_category == 'ELDER')
+demo_tester <- select(demo_tester, state_code, CTYNAME, TOT_POP_ELDER = TOT_POP)
+
+df <- left_join(x = df,
+                y = demo_tester,
+                by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
+
+age_cat <- c('CHILD', 'ADULT', 'ELDER')
+wanted_cols <- grouped_demo_df[,5:82]
+wanted_col_names <- names(wanted_cols)
+
+for (name in wanted_col_names) {
+  for (category in age_cat) {
+    new_merge = vector_app(name, category)
+    colnames(new_merge)[1] <- paste(name, '_', category, sep = "")
+    df <- left_join(x = df,
+                    y = new_merge,
+                    by = c('Recip_State' = 'state_code', 'Recip_County' = 'CTYNAME'))
+  }
+}
+
+df <- na.omit(df)
