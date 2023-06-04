@@ -1,7 +1,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
-library(reshape2)
+library(purrr)
 
 
 df <- read.csv("refined_data_set.csv")
