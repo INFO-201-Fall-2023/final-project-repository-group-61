@@ -96,10 +96,15 @@ shinyApp(ui, server)
 
 #############################################
 
+summary_df <- read_csv("summary.csv")
+df <- read.csv("refined_data_set.csv")
+df <- filter(df, Date == "07/01/2021")
+states <- state.abb
+
 ui <- fluidPage(selectInput(
   inputId =  "state_name",
   label= "Select a US State",
-  choices = df$Recip_State
+  choices = states
   
   
 ),
