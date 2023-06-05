@@ -2,14 +2,13 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(reshape2)
+library(purrr)
 
+states<- state.abb
 
-df <- read.csv("refined_data_set.csv")
+df_info <- read.csv("refined_data_set.csv")
+df_info <- filter(df_info, Date == "07/01/2021")
 
-summary_cols <- select(summary_df, Recip_County, Recip_State, c(107:112))
-df <- merge(df, summary_cols, by=c('Recip_County', 'Recip_State'))
-df <- mutate(df, complete_per_capita_18plus = (Series_Complete_18Plus - Series_Complete_65Plus) / TOT_POP_ADULT)
-df <- mutate(df, complete_per_capita_elder = (Series_Complete_65Plus / TOT_POP_ADULT))
 
 #UI 
 #ui <- fluidPage(
@@ -27,23 +26,22 @@ df <- mutate(df, complete_per_capita_elder = (Series_Complete_65Plus / TOT_POP_A
 ui <- fluidPage(selectInput(
   inputId =  "state_name",
   label= "Select a US State",
-  choices = df$Recip_State
+  choices = states),
+  plotOutput(outputId = 'df_res'))
   
- 
-),
 
-tableOutput(
-  outputId = "df_res"
-)
-)
   
 
 
 #server stuff goes here 
+
+
 server <- function(input, output) {
-     output$df_res <-renderTable({
+     output$df_res <-renderPlot({
+       
+       df_info <- filter(df_info, Recip_State== input$state_name)
     
-    df_info <- filter(df, Recip_State== input$state_name)
+
     
     wa_df <- select(df_info, Recip_County, Series_Complete_Yes, WA_ABOVE_AVERAGE)
     wa_df <- filter(wa_df, WA_ABOVE_AVERAGE == TRUE)
@@ -83,8 +81,12 @@ server <- function(input, output) {
     
     dfs <- list(wa_df, aa_df, ba_df, ia_df, na_df, h_df)
     dfs <- reduce(dfs, full_join, by='ABOVE_AVG')
-    return(dfs)
-  })
+    dfs = melt(dfs)
+    p <- ggplot(dfs, aes(x= variable, y=value, fill=variable)) +
+      geom_bar(stat = "identity")+
+      labs(x = "Racial Groups", y = "% Population of Fully Vacinated")
+    return(p)
+      })
 }
 
 shinyApp(ui=ui, server=server)
